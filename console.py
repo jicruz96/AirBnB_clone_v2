@@ -120,8 +120,11 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        elif ' ' in args and '=' in args:
-            class_name = args.split(' ')[0]
+        class_name = args.split(' ')[0]
+        if class_name not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+        if ' ' in args and '=' in args:
             attrs_list = args.split(' ')
             for attrs in attrs_list[1:]:
                 key = attrs.split("=")[0]
@@ -136,9 +139,6 @@ class HBNBCommand(cmd.Cmd):
                     attrs_dict.update({key: value})
                 except:
                     pass
-        elif args not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
         new_instance = HBNBCommand.classes[class_name]()
         for key, value in attrs_dict.items():
             setattr(new_instance, key, value)
