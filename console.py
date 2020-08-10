@@ -114,7 +114,6 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-        from re import escape
         """ Create an object of any class"""
         class_name = ""
         attrs_dict = {}
@@ -123,29 +122,26 @@ class HBNBCommand(cmd.Cmd):
             return
         elif ' ' in args and '=' in args:
             class_name = args.split(' ')[0]
-            # num_attrs = args.count("=")
             attrs_list = args.split(' ')
             for attrs in attrs_list[1:]:
                 key = attrs.split("=")[0]
                 value = attrs.split("=")[1]
                 if '"' in value:
                     value = value.replace('_', ' ').strip('"')
-                    value = value.replace('"', '\"')
-                    # print(value)
                 elif '.' in value:
                     value = float(value)
                 else:
                     value = int(value)
-                attrs_dict.update({key: value})
-                # print(key, value)
+                try:
+                    attrs_dict.update({key: value})
+                except:
+                    pass
         elif args not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        # print(attrs_dict)
         new_instance = HBNBCommand.classes[class_name]()
         for key, value in attrs_dict.items():
             setattr(new_instance, key, value)
-        # storage.save()
         print(new_instance.id)
         storage.save()
 
