@@ -31,7 +31,7 @@ class DBStorage():
 
     def all(self, cls=None):
         """Returns all of type cls or all classes if cls=None"""
-        if cls == None:
+        if cls is None:
             objs = self.__session.query(
                 User, State, City, Amenity, Place, Review).all()
         else:
