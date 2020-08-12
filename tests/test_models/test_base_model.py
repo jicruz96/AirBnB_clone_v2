@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ """
+from os import getenv
 from models.base_model import BaseModel
 import unittest
 import datetime
@@ -47,6 +48,7 @@ class test_basemodel(unittest.TestCase):
         with self.assertRaises(TypeError):
             new = BaseModel(**copy)
 
+    @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') == 'db', "Not a database")
     def test_save(self):
         """ Testing save """
         i = self.value()

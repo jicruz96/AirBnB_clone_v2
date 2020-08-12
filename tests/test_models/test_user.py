@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ """
+from sqlalchemy.util.langhelpers import NoneType
 from tests.test_models.test_base_model import test_basemodel
 from models.user import User
 
@@ -16,19 +17,19 @@ class test_User(test_basemodel):
     def test_first_name(self):
         """ """
         new = self.value()
-        self.assertEqual(type(new.first_name), str)
+        self.assertEqual(type(new.first_name), NoneType)
 
     def test_last_name(self):
         """ """
         new = self.value()
-        self.assertEqual(type(new.last_name), str)
+        self.assertEqual(type(new.last_name), NoneType)
 
     def test_email(self):
         """ """
         new = self.value()
-        self.assertEqual(type(new.email), str)
+        self.assertEqual(type(new.email), NoneType)
 
     def test_password(self):
         """ """
         new = self.value()
-        self.assertEqual(type(new.password), str)
+        self.assertEqual(type(new.password), NoneType)
