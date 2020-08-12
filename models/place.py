@@ -41,7 +41,7 @@ class Place(BaseModel, Base):
     @property
     def amenities(self):
         """ Gets amenities attribute """
-        return self.amenities
+        return self.amenity_ids
 
     @amenities.setter
     def amenities(self, obj):
