@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """This module defines a base class for all models in our hbnb clone"""
-import uuid
 from datetime import datetime
+from uuid import uuid4
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, String, DateTime
 
@@ -17,17 +17,16 @@ class BaseModel:
 
     def __init__(self, *args, **kwargs):
         """Instantiates a new model"""
-        if not kwargs:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-        else:
-            isoformat = "%Y-%m-%dT%H:%M:%S.%f"
-            time_func = datetime.strptime
-            kwargs['updated_at'] = time_func(kwargs['updated_at'], isoformat)
-            kwargs['created_at'] = time_func(kwargs['created_at'], isoformat)
-            del kwargs['__class__']  # WHY IS THIS DELETED??
-            self.__dict__.update(kwargs)
+        self.id = str(uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+        date_format = "%Y-%m-%dT%H:%M:%S.%f"
+        if len(kwargs) != 0:
+            for x, y in kwargs.items():
+                if x in ["created_at", "updated_at"]:
+                    self.__dict__[x] = datetime.strptime(y, date_format)
+                elif x != "__class__":
+                    self.__dict__[x] = y
 
     def __str__(self):
         """Returns a string representation of the instance"""
