@@ -7,9 +7,9 @@ from models.user import User
 from models.city import City
 from models.state import State
 from models.base_model import Base
-from os import environ, getenv
+from os import getenv
 from sqlalchemy.engine import create_engine
-from sqlalchemy.orm.session import sessionmaker, scoped_session
+from sqlalchemy.orm.session import sessionmaker
 
 
 class DBStorage():
@@ -25,17 +25,20 @@ class DBStorage():
         db = getenv('HBNB_MYSQL_DB')
         url = "mysql+mysqldb://{}:{}@{}/{}".format(user, pwd, host, db)
         self.__engine = create_engine(url, pool_pre_ping=True)
-        Base.metadata.create_all(self.__engine)
-        if environ['HBNB_ENV'] == 'test':
+        if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
         """Returns all of type cls or all classes if cls=None"""
+        from console import HBNBCommand
+        objs = []
         if cls is None:
-            objs = self.__session.query(
-                User, State, City, Amenity, Place, Review).all()
+            for classes in HBNBCommand.classes:
+                if classes != "BaseModel":
+                    objs.extend(self.__session.query(eval(classes)).all())
         else:
-            objs = self.__session.query(cls).all()
+            class_name = eval(cls)
+            objs = self.__session.query(class_name).all()
         new_dict = {}
         for obj in objs:
             key = obj.__class__.__name__ + '.' + obj.id
@@ -52,11 +55,13 @@ class DBStorage():
 
     def delete(self, obj=None):
         """Deletes the object from the current database session"""
-        if not None:
+        if obj is not None:
             self.__session.query(obj).delete()
 
     def reload(self):
         """Create all tables in the database"""
+        from sqlalchemy.orm import scoped_session
+        Base.metadata.create_all(self.__engine)
         sf = sessionmaker(bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(sf)
         self.__session = Session()

@@ -3,13 +3,14 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+from models import storage
 from models.user import User
 from models.place import Place
 from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from os import getenv
 
 
 class HBNBCommand(cmd.Cmd):
@@ -18,10 +19,15 @@ class HBNBCommand(cmd.Cmd):
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
+    # classes = {
+    #    'BaseModel': BaseModel, 'User': User, 'Place': Place,
+    #    'State': State, 'City': City, 'Amenity': Amenity,
+    #    'Review': Review
+    # }
+    # Switch back once Amenity is added
     classes = {
         'BaseModel': BaseModel, 'User': User, 'Place': Place,
-        'State': State, 'City': City, 'Amenity': Amenity,
-        'Review': Review
+        'State': State, 'City': City, 'Review': Review
     }
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
@@ -33,7 +39,7 @@ class HBNBCommand(cmd.Cmd):
     def preloop(self):
         """Prints if isatty is false"""
         if not sys.__stdin__.isatty():
-            print('(hbnb)')
+            print('(hbnb) ', end='')
 
     def precmd(self, line):
         """Reformat command line for advanced command syntax.
@@ -117,6 +123,8 @@ class HBNBCommand(cmd.Cmd):
         """ Create an object of any class"""
         class_name = ""
         attrs_dict = {}
+        key = ""
+        value = ""
         if not args:
             print("** class name missing **")
             return
@@ -129,6 +137,7 @@ class HBNBCommand(cmd.Cmd):
             for attrs in attrs_list[1:]:
                 key = attrs.split("=")[0]
                 value = attrs.split("=")[1]
+                # print("\nkey: {}\nvalue: {}\n".format(key, value))
                 if '"' in value:
                     value = value.replace('_', ' ').strip('"')
                 elif '.' in value:
@@ -143,7 +152,8 @@ class HBNBCommand(cmd.Cmd):
         for key, value in attrs_dict.items():
             setattr(new_instance, key, value)
         print(new_instance.id)
-        storage.save()
+        new_instance.save()
+        # storage.save()
 
     def help_create(self):
         """ Help information for the create method """
@@ -219,19 +229,21 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
-
+        if args and getenv('HBNB_TYPE_STORAGE') == 'db':
+            console_storage = storage.all(args)
+        else:
+            console_storage = storage.all()
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
+            args = args.split(' ')[0]
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
+            for k, v in console_storage.items():
                 if k.split('.')[0] == args:
                     print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
+            for k, v in console_storage.items():
                 print_list.append(str(v))
-
         print(print_list)
 
     def help_all(self):
