@@ -20,9 +20,9 @@ class HBNBCommand(cmd.Cmd):
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
     classes = {
-       'BaseModel': BaseModel, 'User': User, 'Place': Place,
-       'State': State, 'City': City, 'Amenity': Amenity,
-       'Review': Review
+        'BaseModel': BaseModel, 'User': User, 'Place': Place,
+        'State': State, 'City': City, 'Amenity': Amenity,
+        'Review': Review
     }
 
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
@@ -75,7 +75,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -133,7 +133,6 @@ class HBNBCommand(cmd.Cmd):
             for attrs in attrs_list[1:]:
                 key = attrs.split("=")[0]
                 value = attrs.split("=")[1]
-                # print("\nkey: {}\nvalue: {}\n".format(key, value))
                 if '"' in value:
                     value = value.replace('_', ' ').strip('"')
                 elif '.' in value:
