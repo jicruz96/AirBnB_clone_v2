@@ -92,10 +92,17 @@ class test_basemodel(unittest.TestCase):
         new = self.value()
         self.assertEqual(type(new.created_at), datetime.datetime)
 
+    @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') == 'db', "Not a database")
     def test_updated_at(self):
         """ """
         new = self.value()
         self.assertEqual(type(new.updated_at), datetime.datetime)
+        new.id = "new_id"
+        new.save()
+        new.id = "newer_id"
+        new.save()
+        new.id = "newest_id"
+        new.save()
         n = new.to_dict()
         new = BaseModel(**n)
-        self.assertFalse(new.created_at == new.updated_at)
+        self.assertNotEqual(new.created_at, new.updated_at)
