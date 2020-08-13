@@ -36,3 +36,10 @@ class test_HBNBCommandClass(TestCase):
         new_dict = storage.all().get('State.3').__dict__
         self.assertIn('max_guest', new_dict)
         self.assertIsInstance(new_dict['max_guest'], int)
+
+    def test_do_all(self):
+        """ Tests do_all method """
+        with patch('sys.stdout', new=StringIO()) as f:
+            HBNBCommand().onecmd('create State id="1"')
+            HBNBCommand().onecmd("all State")
+            self.assertNotIn("BaseModel", f.getvalue())
