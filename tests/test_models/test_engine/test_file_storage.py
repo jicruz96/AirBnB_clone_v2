@@ -43,6 +43,20 @@ class test_fileStorage(unittest.TestCase):
         temp = storage.all()
         self.assertIsInstance(temp, dict)
 
+    def test_all_one(self):
+        """ all(cls) returns dict of cls objects only """
+        from models.state import State
+        new = BaseModel()
+        state_dict = storage.all(State)
+        self.assertNotIn(new, state_dict)
+
+    def test_delete(self):
+        """ tests delete method"""
+        new = BaseModel()
+        new.save()
+        self.assertIn(new, storage.all().values())
+        self.assertNotIn(new, storage.all())
+
     def test_base_model_instantiation(self):
         """ File is not created on BaseModel save """
         new = BaseModel()
