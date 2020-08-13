@@ -92,6 +92,7 @@ class test_basemodel(unittest.TestCase):
         new = self.value()
         self.assertEqual(type(new.created_at), datetime.datetime)
 
+    @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') == 'db', "Not a database")
     def test_delete(self):
         from models import storage
         new = self.value()
