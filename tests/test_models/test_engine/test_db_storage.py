@@ -16,20 +16,22 @@ import MySQLdb
 @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db', "Not using database")
 class test_DBStorage(unittest.TestCase):
     """ Class to test the file storage method """
+    args = {
+        "user": getenv('HBNB_MYSQL_USER'),
+        "passwd": getenv('HBNB_MYSQL_PWD'),
+        "db": getenv('HBNB_MYSQL_DB'),
+        "host": getenv('HBNB_MYSQL_HOST')
+    }
 
     def setUp(self):
-        """ Set up test environment """
-        pass
+        """ Setup Func """
+        self.db_connection = MySQLdb.connect(**self.args)
+        self.cursor = self.db_connection.cursor()
 
     def tearDown(self):
-        """ Remove storage file at end of tests """
-        try:
-            # Clean up
-            cursor.close()
-            db_connection.close()
-            # os.remove('file.json')
-        except:
-            pass
+        """ Tear down func """
+        self.cursor.close()
+        self.db_connection.close()
 
     def test_a(self):
         """ __objects is initially empty """
@@ -40,6 +42,7 @@ class test_DBStorage(unittest.TestCase):
         new = State(**{'name': 'California'})
         new.save()
         self.assertIn(new, storage.all().values())
+        new.delete()
 
     def test_all(self):
         """ __objects is properly returned """
@@ -67,6 +70,7 @@ class test_DBStorage(unittest.TestCase):
         self.assertNotIn(new, storage.all().values())
         new.save()
         self.assertIn(new, storage.all().values())
+        new.delete()
 
     def test_reload(self):
         """ Storage file is successfully loaded to __objects """
@@ -76,11 +80,6 @@ class test_DBStorage(unittest.TestCase):
         self.assertIn(new, storage.all().values())
         storage.reload()
         self.assertNotIn(new, storage.all().values())
-        # storage.delete(new)
-
-        # for obj in storage.all().values():
-        #     loaded = obj
-        #     self.assertEqual(new.to_dict()['id'], loaded.to_dict()['id'])
 
     def test_reload_from_nonexistent(self):
         """ Nothing happens if file does not exist """
@@ -95,24 +94,50 @@ class test_DBStorage(unittest.TestCase):
         from models.engine.db_storage import DBStorage
         self.assertEqual(type(storage), DBStorage)
 
-    def test_state_creation(self):
+    def test_creation_1(self):
         """ Tests state creation """
-        args = {
-            "user": getenv('HBNB_MYSQL_USER'),
-            "passwd": getenv('HBNB_MYSQL_PWD'),
-            "db": getenv('HBNB_MYSQL_DB'),
-            "host": getenv('HBNB_MYSQL_HOST')
-        }
-        db_connection = MySQLdb.connect(**args)
-        cursor = db_connection.cursor()
-        cursor.execute('SELECT count(*) FROM states;')
-        length1 = cursor.fetchone()[0]
-        cursor.close()
-        db_connection.close()
+        self.cursor.execute('SELECT count(*) FROM states;')
+        length1 = self.cursor.fetchone()[0]
+        self.cursor.close()
+        self.db_connection.close()
         with patch('sys.stdout', new=StringIO()) as state_id:
             HBNBCommand().onecmd('create State id="42" name="California"')
-        db_connection = MySQLdb.connect(**args)
-        cursor = db_connection.cursor()
-        cursor.execute('SELECT count(*) FROM states;')
-        length2 = cursor.fetchone()[0]
+        self.db_connection = MySQLdb.connect(**self.args)
+        self.cursor = self.db_connection.cursor()
+        self.cursor.execute('SELECT count(*) FROM states;')
+        length2 = self.cursor.fetchone()[0]
+        self.assertEqual(length1 + 1, length2)
+
+    def test_creation_2(self):
+        """ Tests City creation """
+        self.cursor.execute('SELECT count(*) FROM cities;')
+        length1 = self.cursor.fetchone()[0]
+        self.cursor.close()
+        self.db_connection.close()
+        with patch('sys.stdout', new=StringIO()) as output:
+            HBNBCommand().onecmd('create State id="2" name="Oklahoma"')
+            HBNBCommand().onecmd('create City id="1" state_id="2" name="Tulsa"')
+        self.db_connection = MySQLdb.connect(**self.args)
+        self.cursor = self.db_connection.cursor()
+        self.cursor.execute(
+            'SELECT count(*) FROM cities WHERE state_id = 2;')
+        length2 = self.cursor.fetchone()[0]
+        self.assertEqual(length1 + 1, length2)
+
+    def test_creation_3(self):
+        """ Tests Place creation """
+        self.cursor.execute('SELECT count(*) FROM places;')
+        length1 = self.cursor.fetchone()[0]
+        self.cursor.close()
+        self.db_connection.close()
+        with patch('sys.stdout', new=StringIO()) as output:
+            HBNBCommand().onecmd('create State id="1" name="California"')
+            HBNBCommand().onecmd('create City id="2" state_id="1" name="Fremont"')
+            HBNBCommand().onecmd('create User id="42" email="email@gmail.com" password="pwd"')
+            HBNBCommand().onecmd('create Place user_id="42" city_id="2" name="Rad_Place"')
+        self.db_connection = MySQLdb.connect(**self.args)
+        self.cursor = self.db_connection.cursor()
+        self.cursor.execute(
+            'SELECT count(*) FROM places WHERE city_id = 2 AND user_id = 42 AND name = "Rad Place";')
+        length2 = self.cursor.fetchone()[0]
         self.assertEqual(length1 + 1, length2)
