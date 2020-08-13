@@ -3,9 +3,8 @@
 from console import HBNBCommand
 from io import StringIO
 from unittest.mock import patch
-from models.engine.db_storage import DBStorage
 import unittest
-from models.base_model import Base, BaseModel
+from models.base_model import BaseModel
 from models import storage
 from models.state import State
 import os
@@ -114,9 +113,11 @@ class test_DBStorage(unittest.TestCase):
         length1 = self.cursor.fetchone()[0]
         self.cursor.close()
         self.db_connection.close()
+        state_string = 'create State id="2" name="Oklahoma"'
+        city_string = 'create City id="1" state_id="2" name="Tulsa"'
         with patch('sys.stdout', new=StringIO()) as output:
-            HBNBCommand().onecmd('create State id="2" name="Oklahoma"')
-            HBNBCommand().onecmd('create City id="1" state_id="2" name="Tulsa"')
+            HBNBCommand().onecmd(state_string)
+            HBNBCommand().onecmd(city_string)
         self.db_connection = MySQLdb.connect(**self.args)
         self.cursor = self.db_connection.cursor()
         self.cursor.execute(
@@ -130,14 +131,20 @@ class test_DBStorage(unittest.TestCase):
         length1 = self.cursor.fetchone()[0]
         self.cursor.close()
         self.db_connection.close()
+        state_string = 'create State id="1" name="California"'
+        city_string = 'create City id="2" state_id="1" name="Fremont"'
+        user_string = 'create User id="42" email="42@gmail.com" password="pwd"'
+        place_string = 'create Place user_id="42" city_id="2" name="Rad_Place"'
         with patch('sys.stdout', new=StringIO()) as output:
-            HBNBCommand().onecmd('create State id="1" name="California"')
-            HBNBCommand().onecmd('create City id="2" state_id="1" name="Fremont"')
-            HBNBCommand().onecmd('create User id="42" email="email@gmail.com" password="pwd"')
-            HBNBCommand().onecmd('create Place user_id="42" city_id="2" name="Rad_Place"')
+            HBNBCommand().onecmd(state_string)
+            HBNBCommand().onecmd(city_string)
+            HBNBCommand().onecmd(user_string)
+            HBNBCommand().onecmd(place_string)
         self.db_connection = MySQLdb.connect(**self.args)
         self.cursor = self.db_connection.cursor()
-        self.cursor.execute(
-            'SELECT count(*) FROM places WHERE city_id = 2 AND user_id = 42 AND name = "Rad Place";')
+        qs1 = 'SELECT count(*) FROM places WHERE city_id = 2 '
+        qs2 = 'AND user_id = 42 AND name = "Rad Place";'
+        qs = qs1 + qs2
+        self.cursor.execute(qs)
         length2 = self.cursor.fetchone()[0]
         self.assertEqual(length1 + 1, length2)
