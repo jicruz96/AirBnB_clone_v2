@@ -1,8 +1,10 @@
 #!/usr/bin/python3
 """ Module for testing file storage"""
+from models.engine.db_storage import DBStorage
 import unittest
-from models.base_model import BaseModel
+from models.base_model import Base, BaseModel
 from models import storage
+from models.state import State
 import os
 from os import getenv
 import MySQLdb
@@ -35,13 +37,14 @@ class test_DBStorage(unittest.TestCase):
         except:
             pass
 
-    def test_obj_list_empty(self):
+    def test_a(self):
         """ __objects is initially empty """
         self.assertEqual(len(storage.all()), 0)
 
     def test_new(self):
         """ New object is correctly added to __objects """
-        new = BaseModel()
+        new = State(**{'name': 'California'})
+        new.save()
         self.assertIn(new, storage.all().values())
 
     def test_all(self):
@@ -53,36 +56,33 @@ class test_DBStorage(unittest.TestCase):
     def test_all_one(self):
         """ all(cls) returns dict of cls objects only """
         new = BaseModel()
-        state_dict = storage.all(State)
+        state_dict = storage.all("State")
         self.assertNotIn(new, state_dict)
 
     def test_delete(self):
         """ tests delete method"""
-        new = BaseModel()
-        self.assertIn(new, storage.all().values())
+        new = State(**{'name': 'California'})
         new.save()
-        self.assertNotIn(new, storage.all().values())
-
-    def test_base_model_instantiation(self):
-        """ File is not created on BaseModel save """
-        new = BaseModel()
+        self.assertIn(new, storage.all().values())
+        storage.delete(new)
         self.assertNotIn(new, storage.all().values())
 
     def test_save(self):
-        """ FileStorage save method """
-        new = BaseModel()
+        """ DBStorage save method """
+        new = State(name="Puerto Rico")
         self.assertNotIn(new, storage.all().values())
-        storage.save()
+        new.save()
         self.assertIn(new, storage.all().values())
 
     def test_reload(self):
         """ Storage file is successfully loaded to __objects """
         from models.state import State
-        new = State()
+        new = State(**{'name': 'California'})
         storage.new(new)
         self.assertIn(new, storage.all().values())
         storage.reload()
         self.assertNotIn(new, storage.all().values())
+        # storage.delete(new)
 
         # for obj in storage.all().values():
         #     loaded = obj
@@ -95,14 +95,6 @@ class test_DBStorage(unittest.TestCase):
     def test_type_objects(self):
         """ Confirm __objects is a dict """
         self.assertEqual(type(storage.all()), dict)
-
-    def test_key_format(self):
-        """ Key is properly formatted """
-        from models.state import State
-        new = State()
-        new.save()
-        _id = new.to_dict()['id']
-        self.assertIn('BaseModel' + '.' + _id, storage.all())
 
     def test_storage_var_created(self):
         """ FileStorage object storage created """
