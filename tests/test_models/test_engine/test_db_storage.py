@@ -115,4 +115,4 @@ class test_DBStorage(unittest.TestCase):
         cursor = db_connection.cursor()
         cursor.execute('SELECT count(*) FROM states;')
         length2 = cursor.fetchone()[0]
-        self.assertGreater(length2, length1)
+        self.assertEqual(length1 + 1, length2)
