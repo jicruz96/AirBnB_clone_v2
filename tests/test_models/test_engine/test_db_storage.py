@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" Module for testing file storage"""
+""" Module for testing db storage"""
 from console import HBNBCommand
 from io import StringIO
 from unittest.mock import patch
@@ -7,14 +7,13 @@ import unittest
 from models.base_model import BaseModel
 from models import storage
 from models.state import State
-import os
 from os import getenv
 import MySQLdb
 
 
 @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db', "Not using database")
 class test_DBStorage(unittest.TestCase):
-    """ Class to test the file storage method """
+    """ Class to test the db storage method """
     args = {
         "user": getenv('HBNB_MYSQL_USER'),
         "passwd": getenv('HBNB_MYSQL_PWD'),
@@ -29,8 +28,11 @@ class test_DBStorage(unittest.TestCase):
 
     def tearDown(self):
         """ Tear down func """
-        self.cursor.close()
-        self.db_connection.close()
+        try:
+            self.cursor.close()
+            self.db_connection.close()
+        except:
+            pass
 
     def test_a(self):
         """ __objects is initially empty """
@@ -60,7 +62,7 @@ class test_DBStorage(unittest.TestCase):
         new = State(**{'name': 'California'})
         new.save()
         self.assertIn(new, storage.all().values())
-        storage.delete(new)
+        new.delete()
         self.assertNotIn(new, storage.all().values())
 
     def test_save(self):

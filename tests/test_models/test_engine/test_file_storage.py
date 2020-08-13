@@ -55,7 +55,8 @@ class test_fileStorage(unittest.TestCase):
         new = BaseModel()
         new.save()
         self.assertIn(new, storage.all().values())
-        self.assertNotIn(new, storage.all())
+        new.delete()
+        self.assertNotIn(new, storage.all().values())
 
     def test_base_model_instantiation(self):
         """ File is not created on BaseModel save """
