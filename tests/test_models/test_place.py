@@ -76,7 +76,8 @@ class test_Place(test_basemodel):
         new = self.value()
         self.assertEqual(type(new.amenity_ids), list)
 
-    @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db', "Not using database")
+    @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') == 'db', "Not using database")
+    @unittest.skip("Maybe invalid")
     def test_place_amenity_ids(self):
         """ Tests a place amenity_ids list """
         # creation of a State
