@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 """ Module for testing file storage"""
+from console import HBNBCommand
+from io import StringIO
+from unittest.mock import patch
 from models.engine.db_storage import DBStorage
 import unittest
 from models.base_model import Base, BaseModel
@@ -16,16 +19,7 @@ class test_DBStorage(unittest.TestCase):
 
     def setUp(self):
         """ Set up test environment """
-
-        args = {
-            "user": getenv('HBNB_MYSQL_USER'),
-            "passwd": getenv('HBNB_MYSQL_PWD'),
-            "db": getenv('HBNB_MYSQL_DB'),
-            "host": getenv('HBNB_MYSQL_HOST')
-        }
-
-        db_connection = MySQLdb.connect(**args)
-        cursor = db_connection.cursor()
+        pass
 
     def tearDown(self):
         """ Remove storage file at end of tests """
@@ -33,7 +27,7 @@ class test_DBStorage(unittest.TestCase):
             # Clean up
             cursor.close()
             db_connection.close()
-            os.remove('file.json')
+            # os.remove('file.json')
         except:
             pass
 
@@ -100,3 +94,25 @@ class test_DBStorage(unittest.TestCase):
         """ FileStorage object storage created """
         from models.engine.db_storage import DBStorage
         self.assertEqual(type(storage), DBStorage)
+
+    def test_state_creation(self):
+        """ Tests state creation """
+        args = {
+            "user": getenv('HBNB_MYSQL_USER'),
+            "passwd": getenv('HBNB_MYSQL_PWD'),
+            "db": getenv('HBNB_MYSQL_DB'),
+            "host": getenv('HBNB_MYSQL_HOST')
+        }
+        db_connection = MySQLdb.connect(**args)
+        cursor = db_connection.cursor()
+        cursor.execute('SELECT count(*) FROM states;')
+        length1 = cursor.fetchone()[0]
+        cursor.close()
+        db_connection.close()
+        with patch('sys.stdout', new=StringIO()) as state_id:
+            HBNBCommand().onecmd('create State id="42" name="California"')
+        db_connection = MySQLdb.connect(**args)
+        cursor = db_connection.cursor()
+        cursor.execute('SELECT count(*) FROM states;')
+        length2 = cursor.fetchone()[0]
+        self.assertGreater(length2, length1)
