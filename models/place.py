@@ -30,13 +30,10 @@ class Place(BaseModel, Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     amenity_ids = []
-    reviews = relationship("Review", cascade="all, delete", backref="place")
-    amenities = relationship(
-        "Amenity",
-        secondary="place_amenity",
-        viewonly=False,
-        backref="place_amenities"
-    )
+    reviews = relationship(
+        "Review", cascade="all, delete-orphan", backref="place")
+    amenities = relationship("Amenity", secondary="place_amenity",
+                             viewonly=False, backref="place_amenities")
 
     @property
     def amenities(self):
@@ -47,6 +44,7 @@ class Place(BaseModel, Base):
     def amenities(self, obj):
         if obj.__class__.__name__ is "Amenity":
             self.amenity_ids.append(obj)
+            # self.amenity_ids.append(obj.__dict__)
 
     @property
     def reviews(self):
