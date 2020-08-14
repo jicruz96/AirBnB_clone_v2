@@ -9,9 +9,10 @@ class State(BaseModel, Base):
     """ State class """
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
-    cities = relationship(
-        "City", cascade="all, delete-orphan", backref="state")
+    cities = relationship("City", cascade="all, delete-orphan",
+                          backref="state", passive_deletes=True)
 
     @property
     def cities(self):
+        """ Cities getter """
         return self.cities
