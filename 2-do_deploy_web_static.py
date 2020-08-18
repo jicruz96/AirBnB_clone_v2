@@ -23,12 +23,13 @@ def do_deploy(archive_path):
 
     dir = '/data/web_static/releases/{}/'.format(archive_name.split('.')[0])
     mkdir = 'if [ ! -d {} ]; then mkdir -p {}; fi'.format(dir, dir),
-    extract = 'tar -xzf /tmp/{} -C {}'.format(archive_name)
+    extract = 'tar -xzf /tmp/{} -C {}'.format(archive_name, dir)
     mv_files = 'mv {}web_static/* {}'.format(dir, dir)
     rm_dir = 'rm -rf {}web_static/'.format(dir)
     rm_tgz = 'rm -rf /tmp/{}'.format(archive_name)
     rm_link = 'rm -rf {}'.format(link_path)
     ln = 'ln --symbolic {} {}'.format(dir, link_path)
+
     commands = [mkdir, extract, mv_files, rm_dir, rm_tgz, rm_link, ln]
     try:
         for command in commands:
