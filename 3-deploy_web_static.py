@@ -57,10 +57,10 @@ def do_deploy(archive_path):
         run('rm -rf {}web_static/'.format(dir))
 
         # Delete old symbolic link
-        rm_link = 'rm -rf {}'.format(link_path)
+        run('rm -rf {}'.format(link_path))
 
         # Make new symbolic link
-        ln = 'ln --symbolic {} {}'.format(dir, link_path)
+        run('ln --symbolic {} {}'.format(dir, link_path))
 
         return True
     except:
