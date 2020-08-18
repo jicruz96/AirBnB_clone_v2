@@ -12,7 +12,7 @@ env.hosts = [web_01, web_02]
 def do_deploy(archive_path):
     """ does deploy """
 
-    if arhive_path is None or not exists(archive_path):
+    if archive_path is None or not exists(archive_path):
         return False
 
     # Create strings for archive name, link path, and target directory
@@ -44,6 +44,9 @@ def do_deploy(archive_path):
 
         # Make new symbolic link
         run('ln --symbolic {} {}'.format(dir, link_path))
+
+        # If we made it here, print this message
+        print('New version deployed!')
 
         return True
     except:
