@@ -52,7 +52,7 @@ then
 fi
 
 # Give ownership of /data/ folder to ubuntu user AND group
-chown -R ubuntu:ubuntu /data/
+chown -hR ubuntu:ubuntu /data/
 
 # Update Nginx configuration to serve content of /data/web_static/current/
 # to /hbnb_static
