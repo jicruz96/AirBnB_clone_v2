@@ -62,6 +62,9 @@ def do_deploy(archive_path):
         # Make new symbolic link
         run('ln --symbolic {} {}'.format(dir, link_path))
 
+        # If we made it here, print this message
+        print('New version deployed!')
+
         return True
     except:
         return False
