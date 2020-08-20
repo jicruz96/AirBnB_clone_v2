@@ -1,12 +1,28 @@
 #!/usr/bin/python3
 """ do_deploy baby """
 
-from fabric.api import run, put, env
+from datetime import datetime as time
+from fabric.api import local, run, put, env
 from os.path import exists
 
 web_01 = '35.190.188.58'
 web_02 = '52.23.162.134'
 env.hosts = [web_01, web_02]
+
+
+def do_pack():
+    """ does pack """
+
+    time_and_date = time.now().strftime("%Y%m%d%H%M%S")
+    archive_name = "versions/web_static_{}.tgz".format(time_and_date)
+
+    local("mkdir -p versions")
+
+    try:
+        local("tar -cvzf {} web_static/".format(archive_name))
+        return archive_name
+    except:
+        return None
 
 
 def do_deploy(archive_path):
@@ -18,7 +34,7 @@ def do_deploy(archive_path):
     # Create strings for archive name, link path, and target directory
     archive_name = archive_path.split('/')[-1]
     link_path = '/data/web_static/current'
-    dir = '/data/web_static/releases/{}/'.format(archive_name.split('.')[0])
+    dir = '/data/web_static/releases/{}/'.format(archive_name[:-4])
 
     try:
         # Transfer archive
