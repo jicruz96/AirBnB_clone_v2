@@ -11,10 +11,10 @@ def do_pack():
     time_and_date = time.now().strftime("%Y%m%d%H%M%S")
     archive_name = "versions/web_static_{}.tgz".format(time_and_date)
 
-    local("if [ ! -d versions ]; then mkdir versions; fi")
+    local("mkdir -p versions")
 
     try:
-        local("tar -czvf {} web_static/".format(archive_name))
+        local("tar -cvzf {} web_static/".format(archive_name))
         return archive_name
     except:
         return None
