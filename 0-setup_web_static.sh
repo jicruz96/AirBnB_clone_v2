@@ -12,20 +12,14 @@ fi
 
 # Create test folder and its parent folders
 DIR='/data/web_static/releases/test/'
-if [ ! -d $DIR ]
-then
-    mkdir -p $DIR;
-fi
+mkdir -p $DIR;
+
 
 # Create BRAND NEW symbolic link to test folder.
 # Remove old symbolic link if it exists
 LINK_NAME='/data/web_static/current'
 
-if [ -f $LINK_NAME ]
-then
-    rm $LINK_NAME;
-fi
-
+rm $LINK_NAME
 ln --symbolic $DIR $LINK_NAME
 
 # Create a placeholder HTML file in test folder
@@ -46,17 +40,15 @@ echo -e "$FAKE_HTML_TEXT" > $FILE_PATH
 
 # Create shared folder under web_static
 DIR='/data/web_static/shared'
-if [ ! -d $DIR ]
-then
-    mkdir -p $DIR;
-fi
+mkdir -p $DIR;
+
 
 # Give ownership of /data/ folder to ubuntu user AND group
 chown -hR ubuntu:ubuntu /data/
 
 # Update Nginx configuration to serve content of /data/web_static/current/
 # to /hbnb_static
-STR="\tlocation = /hbnb_static {\n\
+STR="\tlocation /hbnb_static/ {\n\
 \t\talias /data/web_static/current/;\n\
 \t}\n\
 }\n"
