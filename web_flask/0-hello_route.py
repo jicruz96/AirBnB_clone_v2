@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 """ starts a Flask web app """
 
 from web_flask import app
