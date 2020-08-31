@@ -5,7 +5,8 @@ from web_flask import app
 
 
 @app.route('/', strict_slashes=False)
-def hello_hbnb():
+def home():
+    """ returns page content for home page """
     return "Hello HBNB!"
 
 
