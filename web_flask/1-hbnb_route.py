@@ -6,11 +6,13 @@ from web_flask import app
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
+    """ returns page content for home page """
     return "Hello HBNB!"
 
 
 @app.route('/hbnb', strict_slashes=False)
 def hbnb():
+    """ returns page content for /hbnb page """
     return "HBNB"
 
 
