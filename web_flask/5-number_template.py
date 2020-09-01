@@ -24,10 +24,11 @@ def c(text):
     return "C {}".format(text.replace("_", " "))
 
 
+@app.route('/python', defaults={'text': "is cool"})
 @app.route('/python/<text>', strict_slashes=False)
-def python(text="is cool"):
+def python(text):
     """ returns page for python page """
-    return "Python {}".format(text.replace("_", " "))
+    return "Python {}".format(text.replace("_", " "), text)
 
 
 @app.route('/number/<int:n>', strict_slashes=False)
