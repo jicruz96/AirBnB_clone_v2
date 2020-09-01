@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 """ starts a Flask web app """
 
-from web_flask import app
-from flask import render_template
+from flask import Flask, render_template
+
+app = Flask(__name__)
 
 
 @app.route('/', strict_slashes=False)
