@@ -18,14 +18,11 @@ def remove_session(dummy):
 def states():
     """ returns states page """
     states = list(storage.all("State").values())
-    states = [(state.id, state.name) for state in states]
-    states.sort()
     return render_template('7-states_list.html', states=states)
 
 
 if __name__ == "__main__":
 
-    # Your web application must be listening on 0.0.0.0, port 5000
     app.run(
         host='0.0.0.0',
         port=5000,
