@@ -37,7 +37,10 @@ class DBStorage():
                 if classes != "BaseModel":
                     objs.extend(self.__session.query(eval(classes)).all())
         else:
-            class_name = eval(cls)
+            if isinstance(cls, str):
+                class_name = eval(cls)
+            else:
+                class_name = cls
             objs = self.__session.query(class_name).all()
         new_dict = {}
         for obj in objs:
@@ -56,8 +59,6 @@ class DBStorage():
     def delete(self, obj=None):
         """Deletes the object from the current database session"""
         if obj is not None:
-            # print(type(eval(obj.__class__.__name__)))
-            # self.__session.query(obj).delete()
             cname = eval(obj.__class__.__name__)
             self.__session.query(cname).filter(cname.id == obj.id).delete()
 
@@ -65,6 +66,10 @@ class DBStorage():
         """Create all tables in the database"""
         from sqlalchemy.orm import scoped_session
         Base.metadata.create_all(self.__engine)
-        sf = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        Session = scoped_session(sf)
+        factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        Session = scoped_session(factory)
         self.__session = Session()
+
+    def close(self):
+        """ closes session object"""
+        self.__session.close()
