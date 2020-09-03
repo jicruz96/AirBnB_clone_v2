@@ -14,16 +14,11 @@ class State(BaseModel, Base):
     cities = relationship("City", cascade="all, delete-orphan",
                           backref="state", passive_deletes=True)
 
-    if environ.get('HBNB_TYPE_STORAGE') == 'db':
+    if environ.get('HBNB_TYPE_STORAGE') == 'fs':
+        @property
+        def cities(self):
+            """ Cities getter """
 
-        @property
-        def cities(self):
-            """ Cities getter """
-            return self.cities
-    else:
-        @property
-        def cities(self):
-            """ Cities getter """
             from models import storage
             from models.city import City
             my_cities = []
