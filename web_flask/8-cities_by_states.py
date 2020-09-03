@@ -17,14 +17,8 @@ def remove_session(dummy):
 @app.route('/cities_by_states', strict_slashes=False)
 def cities_by_states():
     """ returns /cities_by_states page """
-    from os import environ as env
     states = storage.all("State").values()
-    if env.get('HBNB_TYPE_STORAGE') == 'fs':
-        cities = {(state.id, state.name): state.cities() for state in states}
-    else:
-        cities = {(state.id, state.name): state.cities for state in states}
-
-    return render_template('8-cities_by_states.html', cities=cities)
+    return render_template('8-cities_by_states.html', states=states)
 
 
 if __name__ == "__main__":
